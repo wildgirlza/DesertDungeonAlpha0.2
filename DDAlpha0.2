@@ -1,0 +1,189 @@
+import random
+print "Welcome, Thief.  Ahead of you lies a dungeon."
+print "Your objective: reach the end and get your loot."
+print "To make choices, enter one of the choices given, normally y for yes and n for no, and press your enter key."
+print "You can also enter 'h' to review other commands.\n"
+
+# FIX THE VARIABLE OUT OF REACH PROBLEM!!!!!!!
+# Added health potion functionality, higher spawn rate of monsters, commands in place of choices,
+# simplified loot, and improved movement.
+
+
+def view_inventory(inventory):
+    inventory["backpack"].sort()
+    inventory["equipped items"].sort()
+    for v in inventory:
+        if v != "gold" and v != "health potions":
+            print "In your %s there is: " % v,
+            print ", ".join(inventory[v])
+        if v == "gold":
+            print "You have %s gold." % inventory[v]
+        if v == "health potions":
+            print "You have %s health potions." % inventory[v]
+
+
+# LEVEL ALPHA! #
+def level_alpha():
+    health = 30
+    inventory = {
+        "backpack": ["amulet of luck"],
+        "equipped items": ["dagger +5", "cloth shirt"],
+        "health potions": 5,
+        "gold": 50,
+    }
+    stuff_list = ["small bottle", "blue flower", "shiny pebble", "glowing amulet",
+                  "tiny bottle of pink powder", "bronze locket", "turquoise gem",
+                  "copper ring", "red feather", "golden seed"]
+    chest = []
+    steps = 0
+    while steps < 100:
+        if health <= 0:
+            break
+        choice = raw_input()
+        if choice == "h":
+            print "Unless prompted otherwise, enter i to view your inventory, h for help, m to move forwards, f to fight,"
+            print "r to move backwards or retreat from combat, c to see your health, d to drink a health potion,"
+            print "and e to explore whatever room you might be in."
+        elif choice == "c":
+            print "Your health is %s." % str(health)
+        elif choice == "s":
+            print "%s steps" % str(steps)
+        elif choice == "d":
+            if inventory["health potions"] > 0:
+                inventory["health potions"] -= 1
+                health += 10
+                if health > 30:
+                    health = 30
+                print "You drank a health potion."
+            else:
+                print "You have no more health potions."
+        elif choice == "e":
+            print "You search the room."
+            num_ = random.randint(1, 3)
+            stuff = stuff_list[random.randint(0, len(stuff_list))]
+            if num_ == 1:
+                pick_up = raw_input("You see something at your feet.  Pick it up? (y/n): ")
+                if pick_up == "y":
+                    print "You put the",
+                    print "%s" % stuff,
+                    print "into your backpack."
+                    inventory["backpack"].append(stuff)
+                elif pick_up == "n":
+                    print "You decided to leave the thing."
+            elif num_ > 1:
+                print "There is nothing of interest here."
+        elif choice == "r":
+            if steps > 5:
+                steps -= random.randint(1, 5)
+                print "You retreated a few steps."
+                print
+            else:
+                print "You can retreat no further."
+        elif choice == "i":
+            view_inventory(inventory)
+        elif choice == "m":
+            steps += random.randint(1, 5)
+            print "You moved forwards a few steps."
+            if 5 <= steps < 100:
+                event_num = random.randint(1, 6)
+                if event_num < 4:
+                    monster_num = random.randint(1, 3)
+                    if monster_num == 1 or monster_num == 3:
+                        print "A rat appeared."
+                        rat = 5
+                        while rat > 0 and health > 0:
+                            choice = raw_input()
+                            if choice == "r":
+                                steps -= random.randint(1, 5)
+                                print "You retreated from combat."
+                                break
+                            elif choice == "f":
+                                while rat > 0:
+                                    dagger_damage = random.randint(1, 5)
+                                    if 0 < dagger_damage <= 5:
+                                        rat -= dagger_damage
+                                        print "You did %s points of damage to rat." % str(dagger_damage),
+                                        print "Rat health is %s" % str(rat)
+                                        break
+                                if rat <= 0:
+                                    print "Rat is dead."
+                                    break
+                                while health > 0:
+                                    rat_damage = random.randint(1, 5)
+                                    if 0 < rat_damage <= 5:
+                                        health -= rat_damage
+                                        print "Rat did %s points of damage to you." % str(rat_damage),
+                                        print "Your health is %s" % str(health)
+                                        break
+                                if health <= 0:
+                                    game = "Game Over."
+                                    print "You died."
+                                    print game
+                                    break
+                            if rat <= 0:
+                                print "Combat over."
+                                break
+                            if health <= 0:
+                                break
+                    elif monster_num == 2:
+                        print "No monster here."
+                elif 3 < event_num < 6:
+                    stuff = stuff_list[random.randint(0, len(stuff_list))]
+                    pick_up = raw_input("You see something at your feet.  Pick it up? (y/n): ")
+                    if pick_up == "y":
+                        print "You put the",
+                        print "%s" % stuff,
+                        print "into your backpack."
+                        inventory["backpack"].append(stuff)
+                    elif pick_up == "n":
+                        print "You decided to leave the thing."
+                elif event_num > 5:
+                    direct = raw_input("The tunnel ahead of you splits. Which path will you choose, right or left? (r/l): ")
+                    if direct == "l":
+                        print "You chose the left path."
+                    elif direct == "r":
+                        print "You chose the right path."
+    if steps >= 100:
+        print "You reached the end of the dungeon! In front of you lies a chest of treasure."
+        open_ = raw_input("There is a chest in from of you.  Open the chest and take what's inside? (y/n): ")
+        if open_ == "y":
+            chest_num = random.randint(1, 3)
+            if chest_num == 1:
+                chest = {
+                    "gold": 500,
+                    "silver ring": 1,
+                    "health potions": 10,
+                    "coronet of stars": 1
+                }
+            elif chest_num == 2:
+                chest = {
+                    "gold": 200,
+                    "health potions": 10,
+                    "large ruby": 1,
+                    "flask of wine": 1
+                }
+            elif chest_num == 3:
+                chest = {
+                    "gold": 450,
+                    "health potions": 12,
+                    "amulet of glory": 1,
+                    "silk-lined boots": 1
+                }
+            print "You took the things from the chest."
+            for i in chest:
+                if i == "gold":
+                    inventory[i] += chest[i]
+                elif i == "health potions":
+                    inventory[i] += chest[i]
+                else:
+                    inventory["backpack"].append(i)
+            invent_ = raw_input("View your inventory? (y/n): ")
+            if invent_ == "y":
+                view_inventory(inventory)
+            print "Game over. Well done!"
+        elif open_ == "n":
+            print "You left the chest undisturbed."
+            print "Game over.  Well done!"
+
+
+level_alpha()
